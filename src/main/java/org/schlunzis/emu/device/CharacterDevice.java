@@ -12,32 +12,32 @@ public class CharacterDevice {
     private int masterFd;
     private ByteConsumer byteConsumer;
 
-    static final Linker LINKER = Linker.nativeLinker();
-    static final SymbolLookup LIBC = Linker.nativeLinker().defaultLookup();
+    private static final Linker LINKER = Linker.nativeLinker();
+    private static final SymbolLookup LIBC = Linker.nativeLinker().defaultLookup();
 
     // int openpty(int*, int*, char*, void*, void*)
-    static final MethodHandle openpty = LINKER.downcallHandle(
+    private static final MethodHandle openpty = LINKER.downcallHandle(
             LIBC.find("openpty").orElseThrow(),
             FunctionDescriptor.of(JAVA_INT,
                     ADDRESS, ADDRESS, ADDRESS, ADDRESS, ADDRESS));
 
-    static final MethodHandle tcgetattr = LINKER.downcallHandle(
+    private static final MethodHandle tcgetattr = LINKER.downcallHandle(
             LIBC.find("tcgetattr").orElseThrow(),
             FunctionDescriptor.of(JAVA_INT, JAVA_INT, ADDRESS));
 
-    static final MethodHandle tcsetattr = LINKER.downcallHandle(
+    private static final MethodHandle tcsetattr = LINKER.downcallHandle(
             LIBC.find("tcsetattr").orElseThrow(),
             FunctionDescriptor.of(JAVA_INT, JAVA_INT, JAVA_INT, ADDRESS));
 
-    static final MethodHandle cfmakeraw = LINKER.downcallHandle(
+    private static final MethodHandle cfmakeraw = LINKER.downcallHandle(
             LIBC.find("cfmakeraw").orElseThrow(),
             FunctionDescriptor.ofVoid(ADDRESS));
 
-    static final MethodHandle read = LINKER.downcallHandle(
+    private static final MethodHandle read = LINKER.downcallHandle(
             LIBC.find("read").orElseThrow(),
             FunctionDescriptor.of(JAVA_LONG, JAVA_INT, ADDRESS, JAVA_LONG));
 
-    static final MethodHandle write = LINKER.downcallHandle(
+    private static final MethodHandle write = LINKER.downcallHandle(
             LIBC.find("write").orElseThrow(),
             FunctionDescriptor.of(JAVA_LONG, JAVA_INT, ADDRESS, JAVA_LONG));
 
@@ -78,13 +78,14 @@ public class CharacterDevice {
             while (!Thread.currentThread().isInterrupted()) {
                 long n = (long) read.invoke(masterFd, buffer, 256L);
                 if (n > 0) {
-                    buffer.fill((byte) 0);
                     if (byteConsumer != null) {
                         for (int i = 0; i < n; i++) {
                             byte b = buffer.get(JAVA_BYTE, i);
+                            System.out.println("RX: " + Integer.toHexString(b));
                             byteConsumer.accept(b);
                         }
                     }
+                    buffer.fill((byte) 0);
                 }
             }
         } catch (Throwable t) {

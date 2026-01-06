@@ -6,8 +6,9 @@ import javafx.stage.Stage;
 import org.schlunzis.emu.device.ByteConsumer;
 import org.schlunzis.emu.device.CharacterDevice;
 import org.schlunzis.emu.device.CharacterDeviceException;
-import org.schlunzis.emu.device.PlainConsumer;
+import org.schlunzis.emu.device.MessageConsumer;
 import org.schlunzis.emu.view.MainView;
+import org.schlunzis.jduino.protocol.tlv.TLV;
 
 import java.io.IOException;
 
@@ -23,7 +24,8 @@ public class EmuApplication extends Application {
 
         Thread.ofVirtual().start(() -> {
             CharacterDevice device = new CharacterDevice();
-            ByteConsumer consumer = new PlainConsumer(device);
+            TLV tlv = new TLV();
+            ByteConsumer consumer = new MessageConsumer<>(tlv);
             device.setByteConsumer(consumer);
             try {
                 device.initialize();
