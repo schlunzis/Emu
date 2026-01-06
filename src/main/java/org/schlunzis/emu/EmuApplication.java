@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.schlunzis.emu.device.ByteConsumer;
 import org.schlunzis.emu.device.CharacterDevice;
+import org.schlunzis.emu.device.CharacterDeviceException;
 import org.schlunzis.emu.device.PlainConsumer;
 import org.schlunzis.emu.view.MainView;
 
@@ -26,7 +27,7 @@ public class EmuApplication extends Application {
             device.setByteConsumer(consumer);
             try {
                 device.initialize();
-            } catch (IOException e) {
+            } catch (CharacterDeviceException e) {
                 throw new RuntimeException(e);
             }
         });
