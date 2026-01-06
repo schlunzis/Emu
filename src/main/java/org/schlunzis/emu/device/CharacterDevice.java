@@ -1,13 +1,24 @@
 package org.schlunzis.emu.device;
 
+import org.schlunzis.emu.model.protocol.CustomProtocol;
+import org.schlunzis.jduino.channel.Channel;
+import org.schlunzis.jduino.channel.ChannelMessageListener;
+import org.schlunzis.jduino.channel.Device;
+import org.schlunzis.jduino.channel.DeviceConfiguration;
+import org.schlunzis.jduino.protocol.Message;
+import org.schlunzis.jduino.protocol.MessageEncoder;
+
 import java.io.IOException;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static java.lang.foreign.ValueLayout.*;
 
-public class CharacterDevice {
+public class CharacterDevice implements Channel<CustomProtocol> {
+
+    private final CustomProtocol protocol;
 
     private int masterFd;
     private ByteConsumer byteConsumer;
@@ -40,6 +51,10 @@ public class CharacterDevice {
     private static final MethodHandle write = LINKER.downcallHandle(
             LIBC.find("write").orElseThrow(),
             FunctionDescriptor.of(JAVA_LONG, JAVA_INT, ADDRESS, JAVA_LONG));
+
+    public CharacterDevice(CustomProtocol protocol) {
+        this.protocol = protocol;
+    }
 
     public void initialize() throws CharacterDeviceException {
         try (Arena arena = Arena.ofConfined()) {
@@ -117,4 +132,45 @@ public class CharacterDevice {
         this.byteConsumer = byteConsumer;
     }
 
+
+    @Override
+    public void open(DeviceConfiguration deviceConfiguration) {
+
+    }
+
+    @Override
+    public void close() {
+        // Nothing to do
+    }
+
+    @Override
+    public void sendMessage(Message<CustomProtocol> message) {
+        MessageEncoder<CustomProtocol> encoder = protocol.getMessageEncoder();
+        try {
+            byte[] encoded = encoder.encode(message);
+            write(encoded);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to send message", e);
+        }
+    }
+
+    @Override
+    public List<? extends Device> getDevices() {
+        return List.of();
+    }
+
+    @Override
+    public void addMessageListener(ChannelMessageListener<CustomProtocol> channelMessageListener) {
+
+    }
+
+    @Override
+    public void removeMessageListener(ChannelMessageListener<CustomProtocol> channelMessageListener) {
+
+    }
+
+    @Override
+    public boolean isConnected() {
+        return false;
+    }
 }
