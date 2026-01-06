@@ -9,6 +9,8 @@ public abstract class ExtensibleListController<T extends Node> {
 
     protected ExtensibleListController(ExtensibleListView<T> extensibleListView) {
         this.extensibleListView = extensibleListView;
+        // add initial element
+        addElement(createNewElement());
 
         this.extensibleListView.getAddButton().setOnAction(_ -> {
             T newElement = createNewElement();

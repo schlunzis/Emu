@@ -5,13 +5,17 @@ import org.schlunzis.jduino.protocol.MessageEncoder;
 import org.schlunzis.jduino.protocol.Protocol;
 
 public class CustomProtocol implements Protocol<CustomProtocol> {
+
+    private final CustomMessageDecoder messageDecoder = new CustomMessageDecoder();
+    private final CustomMessageEncoder messageEncoder = new CustomMessageEncoder();
+
     @Override
     public MessageEncoder<CustomProtocol> getMessageEncoder() {
-        return null;
+        return messageEncoder;
     }
 
     @Override
     public MessageDecoder<CustomProtocol> getMessageDecoder() {
-        return null;
+        return messageDecoder;
     }
 }

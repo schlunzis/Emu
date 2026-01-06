@@ -5,6 +5,7 @@ import org.schlunzis.jduino.channel.Channel;
 import org.schlunzis.jduino.channel.ChannelMessageListener;
 import org.schlunzis.jduino.channel.Device;
 import org.schlunzis.jduino.channel.DeviceConfiguration;
+import org.schlunzis.jduino.channel.serial.SerialDevice;
 import org.schlunzis.jduino.protocol.Message;
 import org.schlunzis.jduino.protocol.MessageEncoder;
 
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.foreign.ValueLayout.*;
@@ -19,7 +21,9 @@ import static java.lang.foreign.ValueLayout.*;
 public class CharacterDevice implements Channel<CustomProtocol> {
 
     private final CustomProtocol protocol;
+    private final List<ChannelMessageListener<CustomProtocol>> messageConsumers = new ArrayList<>();
 
+    private String device;
     private int masterFd;
     private ByteConsumer byteConsumer;
 
@@ -78,7 +82,7 @@ public class CharacterDevice implements Channel<CustomProtocol> {
             masterFd = master.get(JAVA_INT, 0);
             int slaveFd = slave.get(JAVA_INT, 0);
 
-            String device = name.getString(0);
+            device = name.getString(0);
             System.out.println("Client should open: " + device);
 
             // termios struct (size is platform-dependent; 60 bytes works on Linux x86_64)
@@ -93,11 +97,14 @@ public class CharacterDevice implements Channel<CustomProtocol> {
             while (!Thread.currentThread().isInterrupted()) {
                 long n = (long) read.invoke(masterFd, buffer, 256L);
                 if (n > 0) {
-                    if (byteConsumer != null) {
-                        for (int i = 0; i < n; i++) {
-                            byte b = buffer.get(JAVA_BYTE, i);
-                            System.out.println("RX: " + Integer.toHexString(b));
-                            byteConsumer.accept(b);
+                    for (int i = 0; i < n; i++) {
+                        byte b = buffer.get(JAVA_BYTE, i);
+                        protocol.getMessageDecoder().pushNextByte(b);
+                        if (protocol.getMessageDecoder().isMessageComplete()) {
+                            Message<CustomProtocol> message = protocol.getMessageDecoder().getDecodedMessage();
+                            for (ChannelMessageListener<CustomProtocol> consumer : messageConsumers) {
+                                consumer.onMessageReceived(message);
+                            }
                         }
                     }
                     buffer.fill((byte) 0);
@@ -128,14 +135,13 @@ public class CharacterDevice implements Channel<CustomProtocol> {
         }
     }
 
-    public void setByteConsumer(ByteConsumer byteConsumer) {
-        this.byteConsumer = byteConsumer;
-    }
-
-
     @Override
     public void open(DeviceConfiguration deviceConfiguration) {
-
+        try {
+            initialize();
+        } catch (CharacterDeviceException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -156,17 +162,17 @@ public class CharacterDevice implements Channel<CustomProtocol> {
 
     @Override
     public List<? extends Device> getDevices() {
-        return List.of();
+        return List.of(new SerialDevice("Emu Device", device));
     }
 
     @Override
     public void addMessageListener(ChannelMessageListener<CustomProtocol> channelMessageListener) {
-
+        messageConsumers.add(channelMessageListener);
     }
 
     @Override
     public void removeMessageListener(ChannelMessageListener<CustomProtocol> channelMessageListener) {
-
+        messageConsumers.remove(channelMessageListener);
     }
 
     @Override

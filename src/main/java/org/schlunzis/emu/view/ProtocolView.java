@@ -12,6 +12,8 @@ public class ProtocolView extends VBox {
 
     public ProtocolView() {
         textArea.getEditor().getDocument().setText("Write your protocol here...");
+        textArea.getEditor().setCurrentLanguage("java");
+
         this.getChildren().addAll(controlView, textArea);
     }
 
