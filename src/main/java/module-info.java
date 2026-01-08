@@ -5,6 +5,7 @@ module org.schlunzis.emu {
     requires org.schlunzis.jduino.simple;
     requires java.desktop;
     requires java.sql;
+    requires jfx.incubator.richtext;
 
     exports org.schlunzis.emu;
 }

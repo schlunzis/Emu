@@ -5,12 +5,13 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import jfx.incubator.scene.control.richtext.RichTextArea;
 import lombok.Getter;
 
 @Getter
 public class RxTxView extends SplitPane {
 
-    private final TextArea rxArea = new TextArea();
+    private final RichTextArea rxArea = new RichTextArea();
     private final TextArea txArea = new TextArea();
 
     public RxTxView() {

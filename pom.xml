@@ -35,6 +35,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>jfx-incubator-richtext</artifactId>
+            <version>25</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.github.Jaypi4c</groupId>
             <artifactId>monacofx</artifactId>
             <version>1dc6137</version>
