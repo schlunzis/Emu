@@ -11,7 +11,7 @@ public class ProtocolView extends VBox {
     private final MonacoFX textArea = new MonacoFX();
 
     public ProtocolView() {
-        textArea.getEditor().getDocument().setText("Write your protocol here...");
+        textArea.getEditor().getDocument().setText("// Write your protocol here...");
         textArea.getEditor().setCurrentLanguage("java");
 
         this.getChildren().addAll(controlView, textArea);

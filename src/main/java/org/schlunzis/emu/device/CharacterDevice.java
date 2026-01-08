@@ -22,10 +22,11 @@ public class CharacterDevice implements Channel<CustomProtocol> {
 
     private final CustomProtocol protocol;
     private final List<ChannelMessageListener<CustomProtocol>> messageConsumers = new ArrayList<>();
+    private final List<ByteConsumer> rxByteListener = new ArrayList<>();
+    private final List<ByteConsumer> txBbyteListener = new ArrayList<>();
 
     private String device;
     private int masterFd;
-    private ByteConsumer byteConsumer;
 
     private static final Linker LINKER = Linker.nativeLinker();
     private static final SymbolLookup LIBC = Linker.nativeLinker().defaultLookup();
@@ -99,6 +100,7 @@ public class CharacterDevice implements Channel<CustomProtocol> {
                 if (n > 0) {
                     for (int i = 0; i < n; i++) {
                         byte b = buffer.get(JAVA_BYTE, i);
+                        rxByteListener.forEach(l -> l.accept(b));
                         protocol.getMessageDecoder().pushNextByte(b);
                         if (protocol.getMessageDecoder().isMessageComplete()) {
                             Message<CustomProtocol> message = protocol.getMessageDecoder().getDecodedMessage();
@@ -130,6 +132,9 @@ public class CharacterDevice implements Channel<CustomProtocol> {
             if (written != data.length) {
                 throw new IOException("Failed to write all bytes to device");
             }
+            for (byte b : data)
+                for (ByteConsumer c : txBbyteListener)
+                    c.accept(b);
         } catch (Throwable e) {
             throw new IOException("Error writing to device", e);
         }
@@ -173,6 +178,14 @@ public class CharacterDevice implements Channel<CustomProtocol> {
     @Override
     public void removeMessageListener(ChannelMessageListener<CustomProtocol> channelMessageListener) {
         messageConsumers.remove(channelMessageListener);
+    }
+
+    public void addRxByteListener(ByteConsumer consumer) {
+        rxByteListener.add(consumer);
+    }
+
+    public void addTxByteListener(ByteConsumer consumer) {
+        txBbyteListener.add(consumer);
     }
 
     @Override

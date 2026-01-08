@@ -3,10 +3,7 @@ package org.schlunzis.emu;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.schlunzis.emu.controller.ButtonController;
-import org.schlunzis.emu.controller.ExtensibleListController;
-import org.schlunzis.emu.controller.LEDController;
-import org.schlunzis.emu.controller.MainController;
+import org.schlunzis.emu.controller.*;
 import org.schlunzis.emu.device.CharacterDevice;
 import org.schlunzis.emu.device.CharacterDeviceException;
 import org.schlunzis.emu.model.Model;
@@ -24,7 +21,7 @@ public class EmuApplication extends Application {
         Model model = new Model(protocol, device);
         MainController mainController = createViewController(model);
         MainView mainView = mainController.getMainView();
-        Scene scene = new Scene(mainView, 320, 240);
+        Scene scene = new Scene(mainView, 640, 480);
         stage.setTitle("Emuuuuuuuuuu");
         stage.setScene(scene);
         stage.show();
@@ -57,6 +54,8 @@ public class EmuApplication extends Application {
                 return ledView;
             }
         };
+
+        new RxTxController(mainView.getRxTxView(), model);
 
         return new MainController(mainView);
     }

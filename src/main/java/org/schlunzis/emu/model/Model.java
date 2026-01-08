@@ -1,5 +1,6 @@
 package org.schlunzis.emu.model;
 
+import org.schlunzis.emu.device.ByteConsumer;
 import org.schlunzis.emu.device.CharacterDevice;
 import org.schlunzis.emu.model.protocol.CustomMessage;
 import org.schlunzis.emu.model.protocol.CustomProtocol;
@@ -15,6 +16,7 @@ public class Model {
     private final CharacterDevice characterDevice;
 
     private final List<Consumer<CustomMessage>> listeners = new ArrayList<>();
+    private final List<Runnable> messageSentListeners = new ArrayList<>();
 
     public Model(Protocol<CustomProtocol> protocol, CharacterDevice characterDevice) {
         this.protocol = protocol;
@@ -40,6 +42,20 @@ public class Model {
     public void send(CustomMessage message) {
         System.out.println("Model sending message: " + message);
         characterDevice.sendMessage(message);
+        for (Runnable listener : messageSentListeners)
+            listener.run();
+    }
+
+    public void addRxByteListener(ByteConsumer consumer) {
+        characterDevice.addRxByteListener(consumer);
+    }
+
+    public void addTxByteListener(ByteConsumer consumer) {
+        characterDevice.addTxByteListener(consumer);
+    }
+
+    public void addMessageSentListener(Runnable listener) {
+        messageSentListeners.add(listener);
     }
 
 }
