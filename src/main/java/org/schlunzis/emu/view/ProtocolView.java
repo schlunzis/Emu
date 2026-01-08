@@ -1,6 +1,7 @@
 package org.schlunzis.emu.view;
 
 import eu.mihosoft.monacofx.MonacoFX;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import lombok.Getter;
 
@@ -13,6 +14,7 @@ public class ProtocolView extends VBox {
     public ProtocolView() {
         textArea.getEditor().getDocument().setText("// Write your protocol here...");
         textArea.getEditor().setCurrentLanguage("java");
+        VBox.setVgrow(textArea, Priority.ALWAYS);
 
         this.getChildren().addAll(controlView, textArea);
     }

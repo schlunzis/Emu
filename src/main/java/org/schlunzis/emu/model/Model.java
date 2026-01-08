@@ -4,6 +4,7 @@ import org.schlunzis.emu.device.ByteConsumer;
 import org.schlunzis.emu.device.CharacterDevice;
 import org.schlunzis.emu.model.protocol.CustomMessage;
 import org.schlunzis.emu.model.protocol.CustomProtocol;
+import org.schlunzis.jduino.channel.serial.SerialDevice;
 import org.schlunzis.jduino.protocol.Protocol;
 
 import java.util.ArrayList;
@@ -56,6 +57,10 @@ public class Model {
 
     public void addMessageSentListener(Runnable listener) {
         messageSentListeners.add(listener);
+    }
+
+    public String getDeviceName() {
+        return ((SerialDevice) characterDevice.getDevices().getFirst()).portPath();
     }
 
 }

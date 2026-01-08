@@ -56,6 +56,8 @@ public class EmuApplication extends Application {
         };
 
         new RxTxController(mainView.getRxTxView(), model);
+        DeviceNameController deviceNameController = new DeviceNameController(mainView.getProtocolView().getControlView().getDeviceNameView(), model);
+        new ControlController(mainView.getProtocolView().getControlView(), model, deviceNameController);
 
         return new MainController(mainView);
     }
