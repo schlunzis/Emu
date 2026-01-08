@@ -18,13 +18,13 @@ public class RxTxView extends SplitPane {
         txArea.setEditable(false);
 
         VBox rxBox = new VBox();
-        Label rxLabel = new Label("Received Messages");
+        Label rxLabel = new Label("Received Bytes");
         rxBox.getChildren().add(rxLabel);
         rxBox.getChildren().addAll(rxArea);
         VBox.setVgrow(rxArea, Priority.ALWAYS);
 
         VBox txBox = new VBox();
-        Label txLabel = new Label("Transmitted Messages");
+        Label txLabel = new Label("Transmitted Bytes");
         txBox.getChildren().add(txLabel);
         txBox.getChildren().addAll(txArea);
         VBox.setVgrow(txArea, Priority.ALWAYS);
