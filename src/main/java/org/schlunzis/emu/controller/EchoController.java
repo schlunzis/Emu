@@ -5,6 +5,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import org.schlunzis.emu.model.Model;
+import org.schlunzis.emu.model.protocol.ACKMessage;
 import org.schlunzis.emu.model.protocol.CustomMessage;
 import org.schlunzis.emu.model.protocol.EchoMessage;
 import org.schlunzis.emu.view.EchoView;
@@ -57,6 +58,7 @@ public class EchoController {
                         Platform.runLater(() ->
                                 echoView.getEchoListView().getItems().add(new EchoListItem(EchoItemDirection.RECEIVED, m))
                         );
+                        model.send(new ACKMessage("Echo: " + m));
                     }
                 }
         );
@@ -81,15 +83,15 @@ public class EchoController {
         };
     }
 
+    public enum EchoItemDirection {
+        SENT,
+        RECEIVED
+    }
+
     public record EchoListItem(
             EchoItemDirection direction,
             String message
     ) {
-    }
-
-    public enum EchoItemDirection {
-        SENT,
-        RECEIVED
     }
 
 }

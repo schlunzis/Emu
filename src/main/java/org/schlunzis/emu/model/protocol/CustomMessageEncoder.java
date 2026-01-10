@@ -13,10 +13,10 @@ public class CustomMessageEncoder implements MessageEncoder<CustomProtocol> {
     @Override
     public byte[] encode(Message<CustomProtocol> message) {
         TLVMessage m = switch (message) {
-            case ButtonMessage(byte buttonId) -> new TLVMessage(SimpleChannel.CMD_BUTTON, new byte[]{buttonId});
-            case LEDMessage(byte ledId, boolean state) ->
-                    new TLVMessage(SimpleChannel.CMD_LED, new byte[]{ledId, booleanToByte(state)});
-            case EchoMessage(String text) -> new TLVMessage(SimpleChannel.CMD_ECHO, text.getBytes());
+            case ButtonMessage btn -> new TLVMessage(SimpleChannel.CMD_BUTTON, btn.getPayload());
+            case LEDMessage led -> new TLVMessage(SimpleChannel.CMD_LED, led.getPayload());
+            case EchoMessage echo -> new TLVMessage(SimpleChannel.CMD_ECHO, echo.getPayload());
+            case ACKMessage ack -> new TLVMessage((byte) 0, ack.getPayload());
             default -> throw new IllegalArgumentException("Unknown message type: " + message.getClass().getName());
         };
         return tlvMessageEncoder.encode(m);

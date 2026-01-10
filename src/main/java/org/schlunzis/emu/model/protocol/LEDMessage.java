@@ -6,11 +6,14 @@ public record LEDMessage(
 ) implements CustomMessage {
     @Override
     public byte getMessageType() {
-        return 0;
+        return 3;
     }
 
     @Override
     public byte[] getPayload() {
-        return new byte[0];
+        return new byte[]{
+            (byte) pin,
+            (byte) (state ? 1 : 0)
+        };
     }
 }

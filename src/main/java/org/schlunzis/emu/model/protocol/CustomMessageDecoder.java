@@ -24,12 +24,13 @@ public class CustomMessageDecoder implements MessageDecoder<CustomProtocol> {
     public Message<CustomProtocol> getDecodedMessage() {
         TLVMessage tlvMessage = tlvMessageDecoder.getDecodedMessage();
         return switch (tlvMessage) {
-            case TLVMessage(byte type, byte[] value) when type == SimpleChannel.CMD_BUTTON ->
-                    new ButtonMessage(value[0]);
+            case TLVMessage(byte type, byte[] _) when type == SimpleChannel.CMD_BUTTON ->
+                    new ButtonMessage();
             case TLVMessage(byte type, byte[] value) when type == SimpleChannel.CMD_LED ->
                     new LEDMessage(value[0], byteToBoolean(value[1]));
             case TLVMessage(byte type, byte[] value) when type == SimpleChannel.CMD_ECHO ->
                     new EchoMessage(new String(value));
+            case TLVMessage(byte type, byte[] value) when type == 0 -> new ACKMessage(new String(value));
             default -> throw new IllegalArgumentException("Unknown message type: " + tlvMessage.getMessageType());
         };
     }

@@ -6,7 +6,7 @@ public record LCDMessage(
 ) implements CustomMessage {
     @Override
     public byte getMessageType() {
-        return 2;
+        return 4;
     }
 
     @Override

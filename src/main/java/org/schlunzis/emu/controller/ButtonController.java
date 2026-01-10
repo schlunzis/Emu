@@ -14,8 +14,7 @@ public class ButtonController {
         this.model = model;
 
         this.buttonView.getButton().setOnAction(_ -> {
-            int pin = getButtonPin();
-            model.send(new ButtonMessage(pin));
+            model.send(new ButtonMessage());
         });
     }
 

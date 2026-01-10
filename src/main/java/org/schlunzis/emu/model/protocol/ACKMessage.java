@@ -2,14 +2,14 @@ package org.schlunzis.emu.model.protocol;
 
 import java.nio.charset.StandardCharsets;
 
-public record ButtonMessage() implements CustomMessage {
+public record ACKMessage(String message) implements CustomMessage {
     @Override
     public byte getMessageType() {
-        return 2;
+        return 0;
     }
 
     @Override
     public byte[] getPayload() {
-        return "Emu Btn msg".getBytes(StandardCharsets.UTF_8);
+        return message.getBytes(StandardCharsets.UTF_8);
     }
 }
