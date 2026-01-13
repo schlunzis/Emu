@@ -1,6 +1,7 @@
 package org.schlunzis.emu.controller;
 
 import org.schlunzis.emu.model.Model;
+import org.schlunzis.emu.model.protocol.ACKMessage;
 import org.schlunzis.emu.model.protocol.LEDMessage;
 import org.schlunzis.emu.view.LEDView;
 
@@ -16,6 +17,7 @@ public class LEDController {
         this.model.addListener(msg -> {
             if (msg instanceof LEDMessage(int pin, boolean state) && pin == getLEDPin()) {
                 setLED(state);
+                model.send(new ACKMessage("OK"));
             }
         });
     }
